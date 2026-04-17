@@ -4,26 +4,6 @@ textcolor='\033[1;36m'
 red='\033[1;31m'
 clear='\033[0m'
 
-check_root() {
-    if [[ $EUID -ne 0 ]]
-    then
-        echo ""
-        echo -e "${red}Error: this script should be run as root, use \"sudo -i\" command first${clear}"
-        echo ""
-        exit 1
-    fi
-}
-
-check_sbmanager() {
-    if [[ -f /usr/local/bin/sbmanager ]] && [[ ! -f /usr/local/bin/proxylist ]]
-    then
-        echo ""
-        echo -e "${red}Error: this script should be run on the client device, not on the server${clear}"
-        echo ""
-        exit 1
-    fi
-}
-
 banner() {
     echo ""
     echo "╔══╗ ╔══╗ ╦══╗"
@@ -49,48 +29,49 @@ enter_language() {
     fi
 }
 
-install_sing_box() {
+download_sing_box() {
     declare -A -g general_message=()
-    general_message[1_ru]="${textcolor}Sing-Box не установлен${clear}"
-    general_message[2_ru]="${textcolor}[?]${clear} Нажмите ${textcolor}Enter${clear}, чтобы установить, или введите ${textcolor}x${clear}, чтобы выйти:"
-    general_message[3_ru]="${textcolor}Установка Sing-Box...${clear}"
-    general_message[4_ru]="${textcolor}Sing-Box успешно установлен${clear}"
-    general_message[5_ru]="Его можно обновлять командой ${textcolor}apt-get install sing-box -y${clear}"
-    general_message[6_ru]="${red}Ошибка: не удалось установить Sing-Box, попробуйте позже${clear}"
-    general_message[1_en]="${textcolor}Sing-Box is not installed${clear}"
-    general_message[2_en]="${textcolor}[?]${clear} Press ${textcolor}Enter${clear} to install it or enter ${textcolor}x${clear} to exit:"
-    general_message[3_en]="${textcolor}Installing Sing-Box...${clear}"
-    general_message[4_en]="${textcolor}Sing-Box has been installed successfully${clear}"
-    general_message[5_en]="It can be updated with ${textcolor}apt-get install sing-box -y${clear} command"
-    general_message[6_en]="${red}Error: failed to install Sing-Box, try again later${clear}"
+    general_message[1_ru]="${textcolor}Sing-Box не найден в ${HOME}/sing-box-dir/${clear}"
+    general_message[2_ru]="${textcolor}[?]${clear} Нажмите ${textcolor}Enter${clear}, чтобы скачать, или введите ${textcolor}x${clear}, чтобы выйти:"
+    general_message[3_ru]="${textcolor}Скачивание Sing-Box...${clear}"
+    general_message[4_ru]="${textcolor}Sing-Box успешно скачан${clear}"
+    general_message[5_ru]="Его можно обновить, удалив файл ${textcolor}${HOME}/sing-box-dir/sing-box${clear} и запустив этот скрипт ещё раз"
+    general_message[6_ru]="${red}Ошибка: не удалось скачать Sing-Box, попробуйте позже${clear}"
+    general_message[1_en]="${textcolor}Sing-Box was not found in ${HOME}/sing-box-dir/${clear}"
+    general_message[2_en]="${textcolor}[?]${clear} Press ${textcolor}Enter${clear} to download it or enter ${textcolor}x${clear} to exit:"
+    general_message[3_en]="${textcolor}Downloading Sing-Box...${clear}"
+    general_message[4_en]="${textcolor}Sing-Box has been downloaded successfully${clear}"
+    general_message[5_en]="It can be updated by deleting the ${textcolor}${HOME}/sing-box-dir/sing-box${clear} file and running this script again"
+    general_message[6_en]="${red}Error: failed to download Sing-Box, try again later${clear}"
 
-    touch /usr/local/bin/proxylist
-
-    if ! sing-box version &> /dev/null
+    if [[ ! -f ~/sing-box-dir/sing-box ]]
     then
         echo ""
         echo -e "${general_message[1_$language]}"
         echo ""
         echo -e "${general_message[2_$language]}"
-        read -r sb_install
-        [[ -n $sb_install ]] && echo ""
-        [[ ${sb_install,,} =~ ^(x|х)$ ]] && exit 0
+        read -r sb_download
+        [[ -n $sb_download ]] && echo ""
+        [[ ${sb_download,,} =~ ^(x|х)$ ]] && exit 0
 
         echo -e "${general_message[3_$language]}"
-        [[ ! -d /etc/apt/keyrings ]] && mkdir -p /etc/apt/keyrings
-        curl -fsSL https://sing-box.app/gpg.key -o /etc/apt/keyrings/sagernet.asc && chmod a+r /etc/apt/keyrings/sagernet.asc
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/sagernet.asc] https://deb.sagernet.org/ * *" | tee /etc/apt/sources.list.d/sagernet.list > /dev/null
-        apt-get update -y && apt-get install sing-box -y
-        systemctl disable sing-box.service
-        echo ""
+        [[ ! -d ~/sing-box-dir ]] && mkdir ~/sing-box-dir
+        proc_arch="amd64"
+        [[ $(uname -m) == "aarch64" || $(uname -m) == "arm64" ]] && proc_arch="arm64"
+        zip_url=$(curl -Ls https://api.github.com/repos/SagerNet/sing-box/releases/latest | grep "browser_download_url.*linux-${proc_arch}.tar.gz" | head -n 1 | cut -d '"' -f 4)
+        wget -O ~/sing-box-dir/sing-box.tar.gz ${zip_url}
+        tar -xf ~/sing-box-dir/sing-box.tar.gz --strip-components=1 -C ~/sing-box-dir
+        rm -f ~/sing-box-dir/sing-box.tar.gz
+        chmod +x ~/sing-box-dir/sing-box
 
-        if sing-box version &> /dev/null
+        if ~/sing-box-dir/sing-box version &> /dev/null
         then
             echo -e "${general_message[4_$language]}"
             echo ""
             echo -e "${general_message[5_$language]}"
             echo ""
         else
+            echo ""
             echo -e "${general_message[6_$language]}"
             echo ""
             exit 1
@@ -105,9 +86,9 @@ show_proxies() {
     info_message[1_ru]="${textcolor}Количество прокси:${clear}"
     info_message[1_en]="${textcolor}Number of proxies:${clear}"
 
-    proxy_num=$(cat /usr/local/bin/proxylist | wc -l)
+    proxy_num=$(ls -A1 ~/sing-box-dir | grep ".sh" | wc -l)
     echo -e "${info_message[1_$language]} ${proxy_num}"
-    sed "s/#//g" /usr/local/bin/proxylist
+    ls -A1 ~/sing-box-dir | grep ".sh" | sed "s/\.sh//g"
     echo ""
     main_menu
 }
@@ -191,18 +172,18 @@ enter_proxy_data_add() {
 
 client_script_add() {
     declare -A -g info_message=()
-    info_message[1_ru]='${red}Ошибка: эту команду нужно запускать с sudo или от имени root${clear}'
+    info_message[1_ru]='${red}Ошибка: эту команду нужно запускать с sudo (требуется для запуска tun интерфейса)${clear}'
     info_message[2_ru]='${textcolor}Sing-Box запущен${clear}'
     info_message[3_ru]='Не закрывайте это окно, пока Sing-Box работает'
     info_message[4_ru]='Нажмите ${textcolor}Ctrl + C${clear}, чтобы отключиться'
-    info_message[5_ru]="Команда ${textcolor}${new_comm}${clear} добавлена в /usr/local/bin/, используйте её для подключения к прокси"
-    info_message[1_en]='${red}Error: this command should be run with sudo or as root${clear}'
+    info_message[5_ru]="Команда ${textcolor}${new_comm}${clear} добавлена в ${HOME}/sing-box-dir/, используйте её для подключения к прокси"
+    info_message[1_en]='${red}Error: this command should be run with sudo (required to start tun interface)${clear}'
     info_message[2_en]='${textcolor}Started Sing-Box${clear}'
     info_message[3_en]='Do not close this window while Sing-Box is running'
     info_message[4_en]='Press ${textcolor}Ctrl + C${clear} to disconnect'
-    info_message[5_en]="The command ${textcolor}${new_comm}${clear} has been added to /usr/local/bin/, use it to connect to the proxy"
+    info_message[5_en]="The command ${textcolor}${new_comm}${clear} has been added to ${HOME}/sing-box-dir/, use it to connect to the proxy"
 
-	cat > /usr/local/bin/${new_comm} <<-EOF
+	cat > ~/sing-box-dir/${new_comm}.sh <<-EOF
 	#!/bin/bash
 
 	textcolor='\033[1;36m'
@@ -223,13 +204,14 @@ client_script_add() {
 	echo -e "${info_message[4_$language]}"
 	echo ""
 
-	wget -q -O /etc/sing-box/config.json.1 ${link} && mv -f /etc/sing-box/config.json.1 /etc/sing-box/config.json
+	wget -q -O ${HOME}/sing-box-dir/client.json.1 ${link} && mv -f ${HOME}/sing-box-dir/client.json.1 ${HOME}/sing-box-dir/client.json
 	export ENABLE_DEPRECATED_LEGACY_DNS_SERVERS="true" ENABLE_DEPRECATED_MISSING_DOMAIN_RESOLVER="true"
-	sing-box run -c /etc/sing-box/config.json
+	${HOME}/sing-box-dir/sing-box run -c ${HOME}/sing-box-dir/client.json
 	EOF
 
-    chmod +x /usr/local/bin/${new_comm}
-    echo "#${new_comm}" >> /usr/local/bin/proxylist
+    chmod +x ~/sing-box-dir/${new_comm}.sh
+    grep -q "alias sudo=" ~/.bashrc || echo "alias sudo='sudo '" >> ~/.bashrc
+    echo "alias ${new_comm}='${HOME}/sing-box-dir/${new_comm}.sh'" >> ~/.bashrc
     echo -e "${info_message[5_$language]}"
     echo ""
 }
@@ -254,12 +236,12 @@ exit_del_proxy() {
 
 check_command_del() {
     declare -A -g check_message=()
-    check_message[1_ru]="${red}Ошибка: эта команда не существует в /usr/local/bin/${clear}"
+    check_message[1_ru]="${red}Ошибка: эта команда не существует в ${HOME}/sing-box-dir/${clear}"
     check_message[2_ru]="${textcolor}[?]${clear} Введите удаляемую команду для прокси или введите ${textcolor}x${clear}, чтобы выйти:"
-    check_message[1_en]="${red}Error: this command does not exist in /usr/local/bin/${clear}"
+    check_message[1_en]="${red}Error: this command does not exist in ${HOME}/sing-box-dir/${clear}"
     check_message[2_en]="${textcolor}[?]${clear} Enter the proxy command you want to delete or enter ${textcolor}x${clear} to exit:"
 
-    while [[ -z $del_comm ]] || [[ ! -f /usr/local/bin/${del_comm} ]]
+    while [[ -z $del_comm ]] || [[ ! -f ~/sing-box-dir/${del_comm}.sh ]]
     do
         if [[ -n $del_comm ]]
         then
@@ -287,11 +269,11 @@ enter_proxy_data_del() {
 
 client_script_del() {
     declare -A -g info_message=()
-    info_message[1_ru]="Команда ${textcolor}${del_comm}${clear} удалена из /usr/local/bin/"
-    info_message[1_en]="The command ${textcolor}${del_comm}${clear} has been deleted from /usr/local/bin/"
+    info_message[1_ru]="Команда ${textcolor}${del_comm}${clear} удалена из ${HOME}/sing-box-dir/"
+    info_message[1_en]="The command ${textcolor}${del_comm}${clear} has been deleted from ${HOME}/sing-box-dir/"
 
-    rm -f /usr/local/bin/${del_comm}
-    sed -i "/#${del_comm}/d" /usr/local/bin/proxylist
+    rm -f ~/sing-box-dir/${del_comm}.sh
+    sed -i "/alias ${del_comm}=/d" ~/.bashrc
     echo -e "${info_message[1_$language]}"
     echo ""
 }
@@ -346,9 +328,7 @@ main_menu() {
     esac
 }
 
-check_root
-check_sbmanager
 banner
 enter_language
-install_sing_box
+download_sing_box
 main_menu

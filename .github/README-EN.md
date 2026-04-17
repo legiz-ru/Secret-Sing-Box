@@ -94,9 +94,9 @@ warp-cli registration license CMD5m479-Y5hS6y79-U06c5mq9
 
 [Windows](Sing-Box-Windows-en.md). This method includes setting up a pure Sing-Box core and does not have a GUI.
 
-[Linux](#client-setup). Run the command below and follow the instructions (for Debian-based distributions).
+[Linux](#client-setup). Run the command below and follow the instructions (does not require sudo).
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/A-Zuro/Secret-Sing-Box/master/Scripts/sb-pc-linux.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/A-Zuro/Secret-Sing-Box/master/Scripts/sb-pc-linux.sh); source ~/.bashrc
 ```
 
 ### Stargazers over time:

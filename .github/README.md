@@ -94,9 +94,9 @@ warp-cli registration license CMD5m479-Y5hS6y79-U06c5mq9
 
 [Windows](Sing-Box-Windows-ru.md). Данный способ включает настройку чистого ядра Sing-Box и не имеет графичекого интерфейса.
 
-[Linux](#настройка-клиентов). Запустите команду ниже и следуйте инструкциям (для дистрибутивов на основе Debian).
+[Linux](#настройка-клиентов). Запустите команду ниже и следуйте инструкциям (не требует sudo).
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/A-Zuro/Secret-Sing-Box/master/Scripts/sb-pc-linux.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/A-Zuro/Secret-Sing-Box/master/Scripts/sb-pc-linux.sh); source ~/.bashrc
 ```
 
 ### Звёзды по времени:
