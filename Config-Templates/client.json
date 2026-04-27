@@ -110,7 +110,6 @@
           "kinescopecdn",
           "researchgate",
           "nextcloud",
-          "wiki",
           "kaspersky",
           "stepik",
           "likee",
@@ -138,10 +137,8 @@
           "yahoo",
           "mozilla",
           "oracle",
-          "adobe",
           "blender",
           "drweb",
-          "gitlab",
           "debian",
           "canonical",
           "python",
@@ -305,7 +302,6 @@
           "kinescopecdn",
           "researchgate",
           "nextcloud",
-          "wiki",
           "kaspersky",
           "stepik",
           "likee",
@@ -336,10 +332,8 @@
           "yahoo",
           "mozilla",
           "oracle",
-          "adobe",
           "blender",
           "drweb",
-          "gitlab",
           "debian",
           "canonical",
           "python",
@@ -492,12 +486,6 @@
         "url": "https://DOMAIN/RULESETPATH/geosite-oracle.srs"
       },
       {
-        "tag": "adobe",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://DOMAIN/RULESETPATH/geosite-adobe.srs"
-      },
-      {
         "tag": "blender",
         "type": "remote",
         "format": "binary",
@@ -508,12 +496,6 @@
         "type": "remote",
         "format": "binary",
         "url": "https://DOMAIN/RULESETPATH/geosite-drweb.srs"
-      },
-      {
-        "tag": "gitlab",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://DOMAIN/RULESETPATH/geosite-gitlab.srs"
       },
       {
         "tag": "debian",

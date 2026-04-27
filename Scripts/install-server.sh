@@ -1375,7 +1375,6 @@ cat > /var/www/${subspath}/${user_key}-TRJ-CLIENT.json <<EOF
           "kinescopecdn",
           "researchgate",
           "nextcloud",
-          "wiki",
           "kaspersky",
           "stepik",
           "likee",
@@ -1403,10 +1402,8 @@ cat > /var/www/${subspath}/${user_key}-TRJ-CLIENT.json <<EOF
           "yahoo",
           "mozilla",
           "oracle",
-          "adobe",
           "blender",
           "drweb",
-          "gitlab",
           "debian",
           "canonical",
           "python",
@@ -1570,7 +1567,6 @@ cat > /var/www/${subspath}/${user_key}-TRJ-CLIENT.json <<EOF
           "kinescopecdn",
           "researchgate",
           "nextcloud",
-          "wiki",
           "kaspersky",
           "stepik",
           "likee",
@@ -1601,10 +1597,8 @@ cat > /var/www/${subspath}/${user_key}-TRJ-CLIENT.json <<EOF
           "yahoo",
           "mozilla",
           "oracle",
-          "adobe",
           "blender",
           "drweb",
-          "gitlab",
           "debian",
           "canonical",
           "python",
@@ -1757,12 +1751,6 @@ cat > /var/www/${subspath}/${user_key}-TRJ-CLIENT.json <<EOF
         "url": "https://${domain}/${rulesetpath}/geosite-oracle.srs"
       },
       {
-        "tag": "adobe",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://${domain}/${rulesetpath}/geosite-adobe.srs"
-      },
-      {
         "tag": "blender",
         "type": "remote",
         "format": "binary",
@@ -1773,12 +1761,6 @@ cat > /var/www/${subspath}/${user_key}-TRJ-CLIENT.json <<EOF
         "type": "remote",
         "format": "binary",
         "url": "https://${domain}/${rulesetpath}/geosite-drweb.srs"
-      },
-      {
-        "tag": "gitlab",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://${domain}/${rulesetpath}/geosite-gitlab.srs"
       },
       {
         "tag": "debian",

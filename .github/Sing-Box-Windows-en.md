@@ -45,7 +45,7 @@ Next, right-click on the shortcut and select «Properties», then go to the «Sh
 
 ![w3](https://github.com/user-attachments/assets/370c8c40-d861-4255-a1b0-e8f081bcae61)
 
-Select «Advanced» and check the «Run as administrator» box, then click OK.
+Select «Advanced» and check the «Run as administrator» box (required to start tun interface), then click OK.
 
 -----
 
